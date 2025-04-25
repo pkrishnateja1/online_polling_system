@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}My Poll Results{% endblock %}
+
+{% block content %}
+<section class="poll-results">
+    <div class="poll-header">
+        <span class="poll-emoji">{{ poll['emoji'] or '🗳️' }}</span>
+        <h2>{{ poll['title'] }}</h2>
+        <p class="private-badge">🔒 Private Results</p>
+    </div>
+    
+    <div class="results-summary">
+        <h3>Poll Results (Private View) 📊</h3>
+        <p>Total votes: {{ total_votes }}</p>
+        
+        {% if winners %}
+            <div class="winner-section">
+                <h4>🏆 Winner{% if winners|length > 1 %}s{% endif %}:</h4>
+                {% for winner in winners %}
+                    <div class="winner-item">
+                        <span class="winner-emoji">{{ winner['emoji'] or '🎉' }}</span>
+                        <span class="winner-text">{{ winner['option_text'] }}</span>
+                        <span class="winner-votes">{{ winner['vote_count'] }} votes ({{ ((winner['vote_count'] / total_votes) * 100)|round(1) }}%)</span>
+                    </div>
+                {% endfor %}
+            </div>
+            
+            <div class="share-section">
+                <h4>Share this poll:</h4>
+                <a href="{{ url_for('share_poll', poll_id=poll['id']) }}" class="btn btn-primary">
+                    Get Shareable Link
+                </a>
+            </div>
+        {% endif %}
+    </div>
+    
+    <div class="results-details">
+        <h4>Detailed Results:</h4>
+        <div class="results-chart">
+            {% for option in options %}
+                <div class="chart-row">
+                    <div class="option-info">
+                        <span class="option-emoji">{{ option['emoji'] or '🔘' }}</span>
+                        <span class="option-text">{{ option['option_text'] }}</span>
+                    </div>
+                    <div class="chart-bar-container">
+                        <div class="chart-bar" style="width: {{ ((option['vote_count'] / total_votes) * 100)|round(1) if total_votes > 0 else 0 }}%">
+                            <span class="chart-percentage">
+                                {% if total_votes > 0 %}
+                                    {{ ((option['vote_count'] / total_votes) * 100)|round(1) }}%
+                                {% else %}
+                                    0%
+                                {% endif %}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="vote-count">
+                        {{ option['vote_count'] }} votes
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}

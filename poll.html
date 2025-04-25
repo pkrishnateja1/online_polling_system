@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}{{ poll['title'] }}{% endblock %}
+
+{% block content %}
+<section class="poll-view">
+    <div class="poll-header">
+        <span class="poll-emoji">{{ poll['emoji'] or '🗳️' }}</span>
+        <h2>{{ poll['title'] }}</h2>
+    </div>
+    
+    <p class="poll-creator">Created by: {{ poll['creator'] }}</p>
+    
+    {% if poll['description'] %}
+        <div class="poll-description">
+            <p>{{ poll['description'] }}</p>
+        </div>
+    {% endif %}
+    
+    {% if has_voted %}
+        <div class="already-voted">
+            <p>✅ You have already voted in this poll.</p>
+            <a href="{{ url_for('poll_results', poll_id=poll['id']) }}" class="btn btn-primary">
+                View Results
+            </a>
+        </div>
+    {% else %}
+        <form action="{{ url_for('vote', poll_id=poll['id']) }}" method="POST" class="vote-form">
+            <div class="options-list">
+                {% for option in options %}
+                    <div class="option-item">
+                        <input type="radio" id="option-{{ option['id'] }}" name="option_id" value="{{ option['id'] }}" required>
+                        <label for="option-{{ option['id'] }}">
+                            <span class="option-emoji">{{ option['emoji'] or '🔘' }}</span>
+                            {{ option['option_text'] }}
+                        </label>
+                    </div>
+                {% endfor %}
+            </div>
+            
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Submit Vote 🗳️</button>
+                <a href="{{ url_for('poll_results', poll_id=poll['id']) }}" class="btn btn-secondary">
+                    View Results
+                </a>
+            </div>
+        </form>
+    {% endif %}
+</section>
+{% endblock %}

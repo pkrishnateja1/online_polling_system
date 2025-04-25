@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<section class="dashboard-section">
+    <h2>Welcome, {{ username }}! 👋</h2>
+    
+    <div class="action-buttons">
+        <a href="{{ url_for('create_poll') }}" class="btn btn-primary">
+            🆕 Create New Poll
+        </a>
+    </div>
+    
+    <div class="poll-lists">
+        <div class="poll-list">
+            <h3>Your Polls</h3>
+            {% if user_polls %}
+                <div class="polls-grid">
+                    {% for poll in user_polls %}
+                        <div class="poll-card">
+                            <div class="poll-header">
+                                <span class="poll-emoji">{{ poll['emoji'] or '🗳️' }}</span>
+                                <h4>{{ poll['title'] }}</h4>
+                            </div>
+                            <p class="poll-description">{{ poll['description'] or 'No description' }}</p>
+                            <div class="poll-stats">
+                                <span>Votes: {{ poll['vote_count'] }}</span>
+                                <span>Created: {{ poll['created_at'][:10] }}</span>
+                            </div>
+                            <div class="poll-actions">
+                                <a href="{{ url_for('view_poll', poll_id=poll['id']) }}" class="btn btn-small">
+                                    View
+                                </a>
+                                <a href="{{ url_for('my_poll_results', poll_id=poll['id']) }}" class="btn btn-small">
+                                    Results
+                                </a>
+                                <a href="{{ url_for('share_poll', poll_id=poll['id']) }}" class="btn btn-small">
+                                    Share
+                                </a>
+                                <form action="{{ url_for('delete_poll', poll_id=poll['id']) }}" method="POST" 
+                                      onsubmit="return confirm('Are you sure you want to delete this poll?');"
+                                      class="delete-form">
+                                    <button type="submit" class="btn btn-small btn-danger">
+                                        Delete
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <p>You haven't created any polls yet.</p>
+                    <a href="{{ url_for('create_poll') }}" class="btn btn-primary">
+                        Create Your First Poll
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+        
+        <div class="poll-list">
+            <h3>Active Polls</h3>
+            {% if active_polls %}
+                <div class="polls-grid">
+                    {% for poll in active_polls %}
+                        <div class="poll-card">
+                            <div class="poll-header">
+                                <span class="poll-emoji">{{ poll['emoji'] or '🗳️' }}</span>
+                                <h4>{{ poll['title'] }}</h4>
+                            </div>
+                            <p class="poll-creator">By: {{ poll['creator'] }}</p>
+                            <p class="poll-description">{{ poll['description'] or 'No description' }}</p>
+                            <div class="poll-stats">
+                                <span>Votes: {{ poll['vote_count'] }}</span>
+                            </div>
+                            <div class="poll-actions">
+                                <a href="{{ url_for('view_poll', poll_id=poll['id']) }}" class="btn btn-small">
+                                    Vote
+                                </a>
+                                {% if poll['created_by'] == session['user_id'] %}
+                                    <a href="{{ url_for('my_poll_results', poll_id=poll['id']) }}" class="btn btn-small">
+                                        Results
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <p>No active polls available.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endblock %}
